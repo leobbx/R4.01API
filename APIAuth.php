@@ -1,7 +1,7 @@
 <?php
 /// Librairies nécéssaire
 include('jwt_utils.php');
-include('bd_utils.php')
+include('bd_utils.php');
 
 /// Paramétrage de l'entête HTTP (pour la réponse au Client)
 header("Content-Type:application/json");
