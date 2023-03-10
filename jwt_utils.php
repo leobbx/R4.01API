@@ -1,6 +1,6 @@
 <?php
 
-function generate_jwt($headers, $payload, $secret = 'secret') {
+function generate_jwt($headers, $payload, $secret = 'Rx4v6lSlaknX8tgSNAOA') {
 	$headers_encoded = base64url_encode(json_encode($headers));
 
 	$payload_encoded = base64url_encode(json_encode($payload));
@@ -13,7 +13,7 @@ function generate_jwt($headers, $payload, $secret = 'secret') {
 	return $jwt;
 }
 
-function is_jwt_valid($jwt, $secret = 'secret') {
+function is_jwt_valid($jwt, $secret = 'Rx4v6lSlaknX8tgSNAOA') {
 	// split the jwt
 	$tokenParts = explode('.', $jwt);
 	$header = base64_decode($tokenParts[0]);
@@ -74,6 +74,13 @@ function get_bearer_token() {
         }
     }
     return null;
+}
+
+function get_role($jwt) {
+	$tokenParts = explode('.', $jwt);
+	$payload = base64_decode($tokenParts[1]);
+
+	return $payload["role"];
 }
 
 ?>
