@@ -45,4 +45,37 @@
             return $pwd["role"];
         }
     }
+
+    function addData($tab){
+        $linkpdo = bdLink();
+        $req = $linkpdo -> prepare("INSERT INTO chuckn_facts (phrase,vote,date_ajout,date_modif,faute,signalement) VALUES (:phrase,0,CURRENT_TIMESTAMP,NULL,0,0)");
+        $res  = $req -> execute(array('phrase' => $tab['phrase']));
+
+        if($res == false){
+            $req -> debugDumpParams();
+                die('Erreur execute');
+        }
+    }
+
+    function delData($id){
+        $linkpdo = bdLink();
+        $req = $linkpdo -> prepare('DELETE FROM chuckn_facts WHERE :id = id');
+        $res = $req -> execute(array("id" => $id));
+
+        if($res == false){
+            $req -> debugDumpParams();
+                die('Erreur execute');
+        }
+    }
+
+    function modifData($tab){
+        $linkpdo = bdLink();
+        $req = $linkpdo -> prepare("UPDATE chuckn_facts SET phrase= :phrase WHERE id = :id");
+        $res = $req -> execute(array('phrase' => $tab['phrase'], 'id' => $tab['id']));
+
+        if($res == false){
+            $req -> debugDumpParams();
+                die('Erreur execute');
+        }
+    }
 ?>
