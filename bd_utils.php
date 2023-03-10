@@ -46,14 +46,67 @@
         }
     }
 
-    function addData($tab){
+    // SANS AUTHENTIFICATION
+    // fonction GET
+    function getMessage($id) {
+        // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
-        $req = $linkpdo -> prepare("INSERT INTO chuckn_facts (phrase,vote,date_ajout,date_modif,faute,signalement) VALUES (:phrase,0,CURRENT_TIMESTAMP,NULL,0,0)");
-        $res  = $req -> execute(array('phrase' => $tab['phrase']));
+        // cas de l'id est null
+        if ($id == null) {
+            // ecriture de la requete pour la consultation de donnees
+            $req = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text FROM utilisateur u, article a
+                                        WHERE u.id_utilisateur = a.id_utilisateur");
+            // execution de la requete                          
+            $res = $req -> execute();
+            if($res == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            }
+        } else {
+            // ecriture de la requete pour la consultation de donnees
+            $req = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text FROM utilisateur u, article a
+                                        WHERE u.id_utilisateur = a.id_utilisateur AND a.id_utilisateur=$id");
+            // execution de la requete                          
+            $res = $req -> execute();
+            if($res == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            }
+        }
+        
 
+    }
+
+    // ROLE PUBLISHER
+
+    //fonction ADD
+    function addArticle($tab){
+        // appelle de la methode pour se connecter a la base de donnees
+        $linkpdo = bdLink();
+        // ecriture de la requete d'ajout
+        $req = $linkpdo -> prepare("INSERT INTO article (date_pub,text,id_utilisateur) VALUES (CURRENT_TIMESTAMP,:text,:id_utilisateur)");
+        // execution de la requete
+        $res  = $req -> execute(array('date_pub' => $tab['date_pub'],
+                                    'text' => $tab['text'],
+                                    'id_utilisateur' => $tab['id_utilisateur']));
         if($res == false){
             $req -> debugDumpParams();
-                die('Erreur execute');
+            die('Erreur execute');
+        }
+    }
+
+    //fonction GET
+    function getMessagePub($id) {
+        // appelle de la methode pour se connecter a la base de donnees
+        $linkpdo = bdLink();
+        // ecriture de la requete pour la consultation de donnees
+        $req = $linkpdo -> prepare("SELECT  a.date_pub, a.text FROM article a
+                                    WHERE a.id_utilisateur = $id");
+        // execution de la requete                          
+        $res = $req -> execute();
+        if($res == false){
+            $req -> debugDumpParams();
+            die('Erreur execute');
         }
     }
 
