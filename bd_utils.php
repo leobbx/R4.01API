@@ -88,19 +88,58 @@
         $linkpdo = bdLink();
         // cas de l'id est égal à 0
         if ($id == 0) {
-             // ecriture de la requete pour la consultation de donnees
-             $req = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text, l.id_utilisateur, COUNT(l.id_utilisateur) as nb_like FROM utilisateur u, article a, like_dislike l
-             WHERE u.id_utilisateur = a.id_utilisateur AND u.id_utilisateur = l.id_utilisateur AND a.id_article = l.id_article GROUP BY a.text");
+            // ecriture des requetes pour la consultation de donnees
+
+            /// requete retournant le nombre de like par article
+            $reqnblike = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text, COUNT(l.id_utilisateur) as nb_like FROM utilisateur u, article a, like_dislike l
+            WHERE u.id_utilisateur = a.id_utilisateur AND a.id_article = l.id_article AND l.statute = 0 GROUP BY a.id_article");
             // execution de la requete                          
-            $res = $req -> execute();
-            if($res == false){
-                $req -> debugDumpParams();
+            $resnblike = $reqnblike -> execute();
+            if($resnblike == false){
+                $reqnblike -> debugDumpParams();
                 die('Erreur execute');
             } else {
-                return $req -> fetchAll(PDO::FETCH_ASSOC);
+                $nblike = $reqnblike -> fetchAll(PDO::FETCH_ASSOC);
             }
+
+            /// requete retournant le nombre de dislike par article
+            $reqnbdislike = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text,COUNT(l.id_utilisateur) as nb_dislike FROM utilisateur u, article a, like_dislike l
+            WHERE u.id_utilisateur = a.id_utilisateur AND a.id_article = l.id_article AND l.statute = 1 GROUP BY a.id_article");
+            // execution de la requete                          
+            $resnbdislike = $reqnbdislike -> execute();
+            if($resnbdislike == false){
+                $reqnbdislike -> debugDumpParams();
+                die('Erreur execute');
+            } else {
+                $nbdislike = $reqnbdislike -> fetchAll(PDO::FETCH_ASSOC);
+            }  
+
+            /// requete retournant la liste des utilisateurs ayant liker par article
+            $reqllike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
+            WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 0");
+            // execution de la requete                          
+            $resllike = $reqllike -> execute();
+            if($resllike == false){
+                $reqllike -> debugDumpParams();
+                die('Erreur execute');
+            } else {
+                $llike = $reqllike -> fetchAll(PDO::FETCH_ASSOC);
+            }  
+
+            /// requete retournant la liste des utilisateurs ayant disliker par article
+            $reqldislike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
+            WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 1");
+            // execution de la requete                          
+            $resldislike = $reqldislike -> execute();
+            if($resldislike == false){
+                $reqldislike -> debugDumpParams();
+                die('Erreur execute');
+            } else {
+                $ldislike = $reqldislike -> fetchAll(PDO::FETCH_ASSOC);
+            }  
+
         }
-        // ecriture de la requete de recuperation de donnees
+        
     }
 
     //fonction DELETE
@@ -108,10 +147,15 @@
         $retour = 0;
         // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
-        // ecriture de la requete de suppression
+        // ecriture des requetes de suppression
+        /// supression dans la table like_dislike
         $req = $linkpdo -> prepare("DELETE FROM like_dislike WHERE id_article = $id");
-        $req1 = $linkpdo -> prepare("DELETE FROM article WHERE id_article = $id");
+        ///execution de la requete
         $res = $req -> execute();
+
+        ///supression dans la table article
+        $req1 = $linkpdo -> prepare("DELETE FROM article WHERE id_article = $id");
+        ///execution de la requete
         $res1 = $req1 -> execute();
         
         if($res == false){
@@ -125,7 +169,6 @@
             die('Erreur execute');
             $retour = 1;
         }
-
         return retour;
     }
 
