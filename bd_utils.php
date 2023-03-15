@@ -51,8 +51,8 @@
     function getMessage($id) {
         // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
-        // cas de l'id est null
-        if ($id == null) {
+        // cas de l'id est égal à 0
+        if ($id == 0) {
             // ecriture de la requete pour la consultation de donnees
             $req = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text FROM utilisateur u, article a
                                         WHERE u.id_utilisateur = a.id_utilisateur");
@@ -61,6 +61,8 @@
             if($res == false){
                 $req -> debugDumpParams();
                 die('Erreur execute');
+            } else {
+                return $req -> fetchAll(PDO::FETCH_ASSOC);
             }
         } else {
             // ecriture de la requete pour la consultation de donnees
@@ -71,13 +73,61 @@
             if($res == false){
                 $req -> debugDumpParams();
                 die('Erreur execute');
+            } else {
+                return $req -> fetchAll(PDO::FETCH_ASSOC);
             }
         }
         
 
     }
 
-    // ROLE PUBLISHER
+    // ROLE MODERATOR
+    //fonction GET
+    function getMessageMod($id) {
+        // appelle de la methode pour se connecter a la base de donnees
+        $linkpdo = bdLink();
+        // cas de l'id est égal à 0
+        if ($id == 0) {
+             // ecriture de la requete pour la consultation de donnees
+             $req = $linkpdo -> prepare("SELECT u.login, a.date_pub, a.text, l.id_utilisateur, COUNT(l.id_utilisateur) as nb_like FROM utilisateur u, article a, like_dislike l
+             WHERE u.id_utilisateur = a.id_utilisateur AND u.id_utilisateur = l.id_utilisateur AND a.id_article = l.id_article GROUP BY a.text");
+            // execution de la requete                          
+            $res = $req -> execute();
+            if($res == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            } else {
+                return $req -> fetchAll(PDO::FETCH_ASSOC);
+            }
+        }
+        // ecriture de la requete de recuperation de donnees
+    }
+
+    //fonction DELETE
+    function delarticle($id) {
+        $retour = 0;
+        // appelle de la methode pour se connecter a la base de donnees
+        $linkpdo = bdLink();
+        // ecriture de la requete de suppression
+        $req = $linkpdo -> prepare("DELETE FROM like_dislike WHERE id_article = $id");
+        $req1 = $linkpdo -> prepare("DELETE FROM article WHERE id_article = $id");
+        $res = $req -> execute();
+        $res1 = $req1 -> execute();
+        
+        if($res == false){
+            $req -> debugDumpParams();
+            die('Erreur execute');
+            $retour = 1;
+        }
+
+        if($res1 == false){
+            $req -> debugDumpParams();
+            die('Erreur execute');
+            $retour = 1;
+        }
+
+        return retour;
+    }
 
     //fonction ADD
     function addArticle($tab){

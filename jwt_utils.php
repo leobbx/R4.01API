@@ -80,7 +80,7 @@ function get_role($jwt) {
 	$tokenParts = explode('.', $jwt);
 	$payload = base64_decode($tokenParts[1]);
 
-	return $payload["role"];
+	return json_decode($payload)->role;
 }
 
 ?>

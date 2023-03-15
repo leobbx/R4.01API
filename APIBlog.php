@@ -6,6 +6,9 @@ include('jwt_utils.php');
 /// Paramétrage de l'entête HTTP (pour la réponse au Client)
 header("Content-Type:application/json");
 
+/// Identification du type de méthode http
+$http_method = $_SERVER['REQUEST_METHOD'];
+
 /// Verification du tocken
 if (is_jwt_valid(get_bearer_token())){
     ///Verification du role
@@ -35,6 +38,8 @@ if (is_jwt_valid(get_bearer_token())){
                     if (!empty($_GET['id'])){
                         $id = $_GET['id'];
 
+                        delarticle($id);
+
                         /// Envoi de la réponse au Client
                         deliver_response(200, "Data successfuly deleted", NULL);
                     } else {
@@ -49,7 +54,7 @@ if (is_jwt_valid(get_bearer_token())){
             break;
         ///Message d'erreur si role inconu
         default:
-            deliver_response(401, "Invalid role", NULL);
+            deliver_response(401, "Invalid role",get_role(get_bearer_token()) );
             break;
     }
  
