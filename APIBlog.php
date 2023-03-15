@@ -16,7 +16,36 @@ if (is_jwt_valid(get_bearer_token())){
             break;
         ///Traitement moderator
         case "moderator":
+            switch ($http_method){
+                /// Cas de la méthode GET
+                case "GET" :
+                    /// Récupération des critères de recherche envoyés par le Client
+                    $id = 0;
+                    if (!empty($_GET['id'])){
+                        $id = $_GET['id'];
+                    }
+        
+                    $matchingData = getMessage($id);
+        
+                    /// Envoi de la réponse au Client
+                    deliver_response(200, "Operation successfuly complete", $matchingData);
+                    break;
+                case "DELETE" :
+                    /// Récupération des critères de supression envoyés par le Client (id)
+                    if (!empty($_GET['id'])){
+                        $id = $_GET['id'];
 
+                        /// Envoi de la réponse au Client
+                        deliver_response(200, "Data successfuly deleted", NULL);
+                    } else {
+                        /// Envoi l'erreur au Client indiqunat le manque d'id
+                        deliver_response(400, "Missing Data - ID", NULL);
+                    }
+                    break;
+                default:
+                    deliver_response(405, "Insufficent permission or no matching method", NULL);
+                    break;
+            }
             break;
         ///Message d'erreur si role inconu
         default:
@@ -39,8 +68,13 @@ if (is_jwt_valid(get_bearer_token())){
 
             $matchingData = getMessage($id);
 
-            /// Envoi de la réponse au Client
-            deliver_response(200, "Operation successfuly complete", $matchingData);
+            if (count($matchingData)==0) {
+                /// Envoi de l'erreur au client
+                deliver_response(400, "No matching data found", NULL);
+            } else {
+                /// Envoi de la réponse au client
+                deliver_response(200, "Operation successfuly complete", $matchingData);
+            }
             break;
         default:
             deliver_response(405, "Insufficent permission or no matching method", NULL);
