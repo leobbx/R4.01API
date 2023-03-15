@@ -172,7 +172,8 @@
         return retour;
     }
 
-    //fonction ADD
+    /// Role PUBLISHER
+    //fonction Ajout d'article
     function addArticle($tab){
         // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
@@ -192,20 +193,32 @@
     function getMessagePub($id) {
         // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
-        // ecriture de la requete pour la consultation de donnees
-        $req = $linkpdo -> prepare("SELECT  a.date_pub, a.text FROM article a
-                                    WHERE a.id_utilisateur = $id");
-        // execution de la requete                          
-        $res = $req -> execute();
-        if($res == false){
-            $req -> debugDumpParams();
-            die('Erreur execute');
+        if ($id == null) {
+            // ecriture de la requete pour la consultation de donnees
+            $req = $linkpdo -> prepare("SELECT a.date_pub, a.text FROM article a");
+            // execution de la requete                          
+            $res = $req -> execute();
+            if($res == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            }
+        } else {
+            // ecriture de la requete pour la consultation de donnees
+            $req = $linkpdo -> prepare("SELECT  a.date_pub, a.text FROM article a
+                                        WHERE a.id_utilisateur = $id");
+            // execution de la requete                          
+            $res = $req -> execute();
+            if($res == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            }
         }
     }
 
-    function delData($id){
+    // fonction DELETE
+    function delarticlepub($id){
         $linkpdo = bdLink();
-        $req = $linkpdo -> prepare('DELETE FROM chuckn_facts WHERE :id = id');
+        $req = $linkpdo -> prepare('DELETE FROM article WHERE :id = id');
         $res = $req -> execute(array("id" => $id));
 
         if($res == false){
