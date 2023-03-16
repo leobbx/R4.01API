@@ -89,36 +89,48 @@
         $linkpdo = bdLink();
         // cas de l'id est égal à 0
         if ($id == 0) {
-            // ecriture des requetes pour la consultation de donnees
+            // création d'un tableau
             $tab=array();
+            // ecriture des requetes pour la consultation de donnee d'un moderator
+            // requete permettant de recuperer toutes les informations lié à un article
             $req= $linkpdo -> query("SELECT a.id_article,a.date_pub,a.text,u.login 
                                     FROM article a,utilisateur u WHERE u.id_utilisateur = a.id_utilisateur");
-            // execution de la requete                          
+
+            // entre dans la boucle si erreur dans la requete                       
             if($req == false){
                 $req -> debugDumpParams();
                 die('Erreur execute');
             } 
+
             while($res = $req -> fetch()) {
 
+                // preparation de la requete permettant de recuperer la liste des utilisateurs ayant like un article donnee
                 $reqlike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
                 WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 0 AND l.id_article = :id");
+                // execution de la requete
                 $res1 = $reqlike -> execute(array ("id" => $res['id_article']));
+
                 if($res1 == false){
                     $reqlike -> debugDumpParams();
                     die('Erreur execute');
                 } else {
+                    // recupere toutes les donnees retourner par la requete dans un tableau
                     $listel = $reqlike -> fetchAll(PDO::FETCH_ASSOC);
                 }
 
+                // preparation de la requete permettant de recuperer la liste des utilisateurs ayant disliker un article donnee
                 $reqdislike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
                 WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 1 AND l.id_article =:id");
+                //execution de la requete
                 $res2 = $reqdislike -> execute(array("id" => $res['id_article']));
                 if($res2 == false){
                     $reqdislike -> debugDumpParams();
                     die('Erreur execute');
                 } else {
+                    // recupere toutes les donnees retourner par la requete dans un tableau
                     $listed = $reqdislike -> fetchAll(PDO::FETCH_ASSOC);
                 }
+                // recuperation de toutes les donnees et insertion dans un tableau
                 $tab[] = array(
                     "auteur" => $res['login'],
                     "date de publication" => $res['date_pub'],
@@ -129,7 +141,63 @@
                     "nombre de dislike" => count($listed)
                 );
             } 
+            // retourne le tableau de donnees
             return $tab; 
+        
+        //cas de l'id est renseigner
+        } else {
+
+            // ecriture des requetes
+            // preparation de la requete permettant la recuperation de toutes les donnees lie à l'article renseigner par l'utilisateur
+            $req= $linkpdo -> query("SELECT a.id_article,a.date_pub,a.text,u.login 
+            FROM article a,utilisateur u WHERE u.id_utilisateur = a.id_utilisateur AND a.id_article = $id");
+
+            if($req == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            } 
+
+            while ($res = $req -> fetch()){
+                //preparation de la requete de recuperation de tout les utilisateurs ayant liké l'article renseigner
+                $reqlike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
+                                                WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 0 AND l.id_article = $id");
+                //execution de la requete
+                $res1 = $reqlike -> execute();
+
+                if($res1 == false){
+                    $reqlike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    // recupere toutes les donnees retourner par la requete dans un tableau
+                    $listel = $reqlike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                // preparation de la requete permettant de recuperer la liste des utilisateurs ayant disliker un article donnee
+                $reqdislike = $linkpdo -> prepare("SELECT u.login FROM utilisateur u, like_dislike l 
+                                                    WHERE u.id_utilisateur = l.Id_Utilisateur AND l.statute = 1 AND l.id_article =$id");
+                //execution de la requete
+                $res2 = $reqdislike -> execute();
+
+                if($res2 == false){
+                    $reqdislike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    // recupere toutes les donnees retourner par la requete dans un tableau
+                    $listed = $reqdislike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+                // recuperation de toutes les donnees et insertion dans un tableau
+                $tab[] = array(
+                    "auteur" => $res['login'],
+                    "date de publication" => $res['date_pub'],
+                    "contenu" => $res['text'],
+                    "utilisateur ayant like cette article" => $listel,
+                    "nombre de like" => count($listel),
+                    "utilisateur ayant dislike cette article" => $listed,
+                    "nombre de dislike" => count($listed)
+                );
+            }
+            // retourne le tableau de donnees
+            return $tab;
         }
         
     }
