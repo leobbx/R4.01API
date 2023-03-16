@@ -29,26 +29,19 @@ if (is_jwt_valid(get_bearer_token())){
                     }
         
                     $matchingData = getMessageMod($id);
-                    if (count($matchingData)==0) {
-                        /// Envoi de l'erreur au client
-                        deliver_response(400, "No matching data found", NULL);
-                    } else {
-                        /// Envoi de la réponse au client
-                        deliver_response(200, "Operation successfuly complete", $matchingData);
-                    }
+        
+                    /// Envoi de la réponse au Client
+                    deliver_response(200, "Operation successfuly complete", $matchingData);
                     break;
                 case "DELETE" :
                     /// Récupération des critères de supression envoyés par le Client (id)
                     if (!empty($_GET['id'])){
                         $id = $_GET['id'];
 
-                        if (delarticle($id)==0){
-                            /// Envoi de la réponse au Client
-                            deliver_response(200, "Data successfuly deleted", NULL);
-                        } else {
-                            /// Envoi de erreur de serveur
-                            deliver_response(500, "Server problem encounter", NULL);
-                        }
+                        delarticle($id);
+
+                        /// Envoi de la réponse au Client
+                        deliver_response(200, "Data successfuly deleted", NULL);
                     } else {
                         /// Envoi l'erreur au Client indiqunat le manque d'id
                         deliver_response(400, "Missing Data - ID", NULL);
