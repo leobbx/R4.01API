@@ -28,7 +28,7 @@ if (is_jwt_valid(get_bearer_token())){
                         $id = $_GET['id'];
                     }
         
-                    $matchingData = getMessage($id);
+                    $matchingData = getMessageMod($id);
         
                     /// Envoi de la réponse au Client
                     deliver_response(200, "Operation successfuly complete", $matchingData);
