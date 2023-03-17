@@ -20,7 +20,7 @@ if (is_jwt_valid(get_bearer_token())){
                     $posteddata = file_get_contents('php://input');
                     $data = json_decode($posteddata,true);
                     addArticle($data);
-                    deliver_response(200, "Operation successfully complete", NULL);
+                    deliver_response(200, "Operation successfully complete", $data);
             }
            
             break;
