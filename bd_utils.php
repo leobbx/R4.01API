@@ -234,8 +234,28 @@
 
     /// Role PUBLISHER
     // test appartenance publisher
-    function BelongToPublisher($id) {
+    function BelongToPublisher($id,$login) {
+        /// SELECT * FROM article, utilisateur where article.Id_Utilisateur=utilisateur.id_utilisateur and utilisateur.login = "jean";
+        $linkpdo = bdLink();
 
+        /// ecriture de la requete e selection
+        $req = $linkpdo -> prepare("SELECT * FROM article, utilisateur where article.Id_Utilisateur=utilisateur.id_utilisateur 
+                                    and utilisateur.login =:login and article.id_article=:id");
+
+        /// execution de la requete
+        $res  = $req -> execute(array('login' => $login, 'id' => $id));
+
+        /// traitement du resultat
+        if ($res == false){
+            $req -> debugDumpParams();
+            die('Erreur execute');
+        } else {
+            $tab = $req -> fetchAll(PDO::FETCH_ASSOC);
+            if (count($tab)==1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //fonction Ajout d'article

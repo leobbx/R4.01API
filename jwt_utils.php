@@ -83,4 +83,11 @@ function get_role($jwt) {
 	return json_decode($payload)->role;
 }
 
+function get_login($jwt) {
+	$tokenParts = explode('.', $jwt);
+	$payload = base64_decode($tokenParts[1]);
+
+	return json_decode($payload)->login;
+}
+
 ?>
