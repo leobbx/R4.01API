@@ -233,20 +233,26 @@
     }
 
     /// Role PUBLISHER
+    // test appartenance publisher
+    function BelongToPublisher($id) {
+
+    }
+
     //fonction Ajout d'article
     function addArticle($tab){
+        $retour = 0;
         // appelle de la methode pour se connecter a la base de donnees
         $linkpdo = bdLink();
         // ecriture de la requete d'ajout
         $req = $linkpdo -> prepare("INSERT INTO article (date_pub,text,id_utilisateur) VALUES (CURRENT_TIMESTAMP,:text,:id_utilisateur)");
         // execution de la requete
-        $res  = $req -> execute(array(
-                                    'text' => $tab['text'],
-                                    'id_utilisateur' => $tab['id_utilisateur']));
-        if($res == false){
+        $res  = $req -> execute(array('text' => $tab['text'],
+                                     'id_utilisateur' => $tab['id_utilisateur']));
+        if ($res == false){
             $req -> debugDumpParams();
             die('Erreur execute');
-        }
+            $retour = 1;
+        } 
     }
 
     //fonction GET
