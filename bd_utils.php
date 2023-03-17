@@ -240,7 +240,7 @@
         // ecriture de la requete d'ajout
         $req = $linkpdo -> prepare("INSERT INTO article (date_pub,text,id_utilisateur) VALUES (CURRENT_TIMESTAMP,:text,:id_utilisateur)");
         // execution de la requete
-        $res  = $req -> execute(array('date_pub' => $tab['date_pub'],
+        $res  = $req -> execute(array(
                                     'text' => $tab['text'],
                                     'id_utilisateur' => $tab['id_utilisateur']));
         if($res == false){

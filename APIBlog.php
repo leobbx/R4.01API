@@ -15,7 +15,14 @@ if (is_jwt_valid(get_bearer_token())){
     switch(get_role(get_bearer_token())){
         ///Traitement publisher
         case "publisher":
-
+            switch($http_method) {
+                case "POST":
+                    $posteddata = file_get_contents('php://input');
+                    $data = json_decode($posteddata,true);
+                    addArticle($data);
+                    deliver_response(200, "Operation successfully complete", NULL);
+            }
+           
             break;
         ///Traitement moderator
         case "moderator":
@@ -31,7 +38,7 @@ if (is_jwt_valid(get_bearer_token())){
                     $matchingData = getMessageMod($id);
         
                     /// Envoi de la réponse au Client
-                    deliver_response(200, "Operation successfuly complete", $matchingData);
+                    deliver_response(200, "Operation successfully complete", $matchingData);
                     break;
                 case "DELETE" :
                     /// Récupération des critères de supression envoyés par le Client (id)
