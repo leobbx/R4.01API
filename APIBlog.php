@@ -24,7 +24,7 @@ if (is_jwt_valid(get_bearer_token())){
                         $id = $_GET['id'];
                     }
         
-                    $matchingData = getMessagePubS($id);
+                    $matchingData = getMessagePub($id);
         
                     if (count($matchingData)==0) {
                         /// Envoi de l'erreur au client
@@ -47,7 +47,7 @@ if (is_jwt_valid(get_bearer_token())){
                         deliver_response(500, "Internal server error", NULL);
                     }
 
-                    break
+                    break;
                 case "DELETE" :
                     /// Récupération des critères de supression envoyés par le Client (id)
                     if (!empty($_GET['id'])){
@@ -63,7 +63,7 @@ if (is_jwt_valid(get_bearer_token())){
                             }
                         } else {
                             /// ENvoie l'erreur au client
-                            deliver_response(405, "Insufficent permission - Imposibility to remove an other user's article"
+                            deliver_response(405, "Insufficent permission - Imposibility to remove an other user's article",NULL);
                         }
                     } else {
                         /// Envoi l'erreur au Client indiqunat le manque d'id
@@ -73,6 +73,7 @@ if (is_jwt_valid(get_bearer_token())){
                 default:
                     deliver_response(405, "Insufficent permission or no matching method", NULL);
                     break;           
+            }
             break;
         ///Traitement moderator
         case "moderator":
