@@ -74,7 +74,7 @@ if (is_jwt_valid(get_bearer_token())){
                     if(belongToPublisher($id,get_login(get_bearer_token()))) {
                         $posteddata = file_get_contents('php://input');
                         $data = json_decode($posteddata,true);
-                        if(delArticle($data)==0) {
+                        if(modifArticle($data)==0) {
                             /// Envoi de la réponse au Client
                             deliver_response(200, "Data successfuly modify", NULL);
                         } else {
@@ -85,6 +85,9 @@ if (is_jwt_valid(get_bearer_token())){
                         /// ENvoie l'erreur au client
                         deliver_response(405, "Insufficent permission - Imposibility to alter an other user's article",NULL);
                     }
+                    break;
+                case "PATCH" :
+
                     break;
                 default:
                     deliver_response(405, "Insufficent permission or no matching method", NULL);
