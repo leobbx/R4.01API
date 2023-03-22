@@ -202,6 +202,7 @@
         
     }
 
+    // Publisher et moderator
     //fonction DELETE
     function delarticle($id) {
         $retour = 0;
@@ -301,26 +302,21 @@
         }
     }
 
-    // fonction DELETE
-    function delarticlepub($id){
-        $linkpdo = bdLink();
-        $req = $linkpdo -> prepare('DELETE FROM article WHERE :id = id');
-        $res = $req -> execute(array("id" => $id));
-
-        if($res == false){
-            $req -> debugDumpParams();
-                die('Erreur execute');
-        }
-    }
-
+    // fonction PUT
     function modifData($tab){
+        //appelle a la methode pour la connexion a la base de donnees
         $linkpdo = bdLink();
-        $req = $linkpdo -> prepare("UPDATE chuckn_facts SET phrase= :phrase WHERE id = :id");
-        $res = $req -> execute(array('phrase' => $tab['phrase'], 'id' => $tab['id']));
+        $retour = 0;
+
+        //preparation de la requete pour la modification d'un article
+        $req = $linkpdo -> prepare("UPDATE article SET text= :text, date_pub = CURRENT_TIMESTAMP WHERE id_article = :id");
+        //execution de la requete
+        $res = $req -> execute(array('text' => $tab['text'], 'id' => $tab['id']));
 
         if($res == false){
             $req -> debugDumpParams();
-                die('Erreur execute');
+            die('Erreur execute');
+            $retour = 1;
         }
     }
 ?>
