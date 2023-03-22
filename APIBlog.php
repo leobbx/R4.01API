@@ -70,6 +70,22 @@ if (is_jwt_valid(get_bearer_token())){
                         deliver_response(400, "Missing Data - ID", NULL);
                     }
                     break;
+                case "PUT" :
+                    if(belongToPublisher($id,get_login(get_bearer_token()))) {
+                        $posteddata = file_get_contents('php://input');
+                        $data = json_decode($posteddata,true);
+                        if(delArticle($data)==0) {
+                            /// Envoi de la réponse au Client
+                            deliver_response(200, "Data successfuly modify", NULL);
+                        } else {
+                            /// Envoi de l'erreur serveur
+                            deliver_response(500, "Internal server error", NULL);
+                        }
+                    } else {
+                        /// ENvoie l'erreur au client
+                        deliver_response(405, "Insufficent permission - Imposibility to alter an other user's article",NULL);
+                    }
+                    break;
                 default:
                     deliver_response(405, "Insufficent permission or no matching method", NULL);
                     break;           
