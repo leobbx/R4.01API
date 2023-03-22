@@ -71,9 +71,9 @@ if (is_jwt_valid(get_bearer_token())){
                     }
                     break;
                 case "PUT" :
-                    if(belongToPublisher($id,get_login(get_bearer_token()))) {
-                        $posteddata = file_get_contents('php://input');
-                        $data = json_decode($posteddata,true);
+                    $posteddata = file_get_contents('php://input');
+                    $data = json_decode($posteddata,true);
+                    if(belongToPublisher($data['id'],get_login(get_bearer_token()))) {
                         if(modifArticle($data)==0) {
                             /// Envoi de la réponse au Client
                             deliver_response(200, "Data successfuly modify", NULL);
@@ -87,7 +87,20 @@ if (is_jwt_valid(get_bearer_token())){
                     }
                     break;
                 case "PATCH" :
-
+                    if(belongToPublisher($id,get_login(get_bearer_token()))) {
+                        /// ENvoie l'erreur au client
+                        deliver_response(405, "Imposibility to like/dislike your own article",NULL);
+                    } else {
+                        $posteddata = file_get_contents('php://input');
+                        $data = json_decode($posteddata,true);
+                        if(modifArticle($data)==0) {
+                            /// Envoi de la réponse au Client
+                            deliver_response(200, "Data successfuly modify", NULL);
+                        } else {
+                            /// Envoi de l'erreur serveur
+                            deliver_response(500, "Internal server error", NULL);
+                        }
+                    }
                     break;
                 default:
                     deliver_response(405, "Insufficent permission or no matching method", NULL);
