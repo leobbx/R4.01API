@@ -303,7 +303,7 @@
     }
 
     // fonction PUT
-    function modifData($tab){
+    function modifArticle($tab){
         //appelle a la methode pour la connexion a la base de donnees
         $linkpdo = bdLink();
         $retour = 0;
