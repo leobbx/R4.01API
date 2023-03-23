@@ -302,6 +302,91 @@
         }
     }
 
+    //fonction PATCH
+    function likeDislike($tab,$login) {
+        //appelle a la methode pour la connexion a la base de donnees
+        $linkpdo = bdLink();
+        $retour = 0;
+        // requete verifiant qu'il y a au moins une ligne inséré avec le login de l'utilisateur et de l'article
+        $req = $linkpdo -> query("SELECT COUNT(l.id_utilisateur) as nbligne , l.statute, u.id_utilisateur FROM like_dislike l, article a, utilisateur u 
+                                  WHERE l.Id_Article = a.id_article AND l.Id_Utilisateur = u.id_utilisateur 
+                                  AND u.login = $login AND a.id_article = $tab['id']");
+        if ($req == false){
+            $req -> debugDumpParams();
+            die('Erreur execute');
+            $retour = 1;
+        } else {
+            $res = $req -> fetch();
+        }
+        // cas où l'utilisateur souhaite mettre un like
+        if ($tab['type']=='like') {
+            // si la requete donne une ligne
+            if ($res['nbligne'] == 1) {
+                // cas où la valeur de la ligne déjà insérer est un like
+                if ($res['l.statute'] == 1) {
+                    $req1 = $linkpdo -> query("DELETE FROM like_dislike WHERE l.id_article = $tab['id'] AND l.id_utilisateur = $res['u.id_utilisateur']");
+
+                    if($req1 == false){
+                        $req1 -> debugDumpParams();
+                        die('Erreur execute');
+                        $retour = 1;
+                    } 
+                //cas où la ligne déjà insérer est un dislike
+                } else {
+                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 0 WHERE id_article = $tab['id'] AND id_utilisateur = $res['u.id_utilisateur']");
+
+                    if($req1 == false){
+                        $req1 -> debugDumpParams();
+                        die('Erreur execute');
+                        $retour = 1;
+                    } 
+                }
+            } else {
+                $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (:id_article, :id_utilisateur, :statute)");
+                $res1 = $req -> execute(array('id_article' => $tab['id'],
+                                               'id_utilisateur' => $res['u.id_utilisateur'],
+                                               'statute' => 1));
+                
+                if($res1 == false){
+                    $req1 -> debugDumpParams();
+                    die('Erreur execute');
+                    $retour = 1;
+                } 
+            }
+        } else {
+            if ($res['nbligne'] == 1) {
+                // cas où la valeur de la ligne déjà insérer est un like
+                if ($res['l.statute'] == 0) {
+                    $req1 = $linkpdo -> query("DELETE FROM like_dislike WHERE l.id_article = $tab['id'] AND l.id_utilisateur = $res['u.id_utilisateur']");
+
+                    if($req1 == false){
+                        $req1 -> debugDumpParams();
+                        die('Erreur execute');
+                        $retour = 1;
+                    } 
+                } else {
+                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 1 WHERE id_article = $tab['id'] AND id_utilisateur = $res['u.id_utilisateur']");
+
+                    if($req1 == false){
+                        $req1 -> debugDumpParams();
+                        die('Erreur execute');
+                        $retour = 1;
+                    } 
+                }
+        } else {
+            $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (:id_article, :id_utilisateur, :statute)");
+            $res1 = $req -> execute(array('id_article' => $tab['id'],
+                                          'id_utilisateur' => $res['u.id_utilisateur'],
+                                           'statute' => 0));
+
+            if($res1 == false){
+                $req1 -> debugDumpParams();
+                die('Erreur execute');
+                $retour = 1;
+            } 
+        }
+    }
+
     // fonction PUT
     function modifArticle($tab){
         //appelle a la methode pour la connexion a la base de donnees
