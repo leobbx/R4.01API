@@ -87,13 +87,13 @@ if (is_jwt_valid(get_bearer_token())){
                     }
                     break;
                 case "PATCH" :
-                    if(belongToPublisher($id,get_login(get_bearer_token()))) {
+                    $posteddata = file_get_contents('php://input');
+                    $data = json_decode($posteddata,true);
+                    if(belongToPublisher($data['id'],get_login(get_bearer_token()))) {
                         /// ENvoie l'erreur au client
                         deliver_response(405, "Imposibility to like/dislike your own article",NULL);
                     } else {
-                        $posteddata = file_get_contents('php://input');
-                        $data = json_decode($posteddata,true);
-                        if(modifArticle($data)==0) {
+                        if(likeDislike($data,get_login(get_bearer_token()))==0) {
                             /// Envoi de la réponse au Client
                             deliver_response(200, "Data successfuly modify", NULL);
                         } else {

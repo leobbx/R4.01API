@@ -4,7 +4,7 @@ Ce travail est réaliser par Babaux Léo et Ndiaye Fatime.
 
 ## Identifient de connexion
 
-__user -> password__
-jean -> $iutinfo (publisher)
-marie -> iutinfo (publisher)
-leo -> leo (moderateur)
+*user -> password*  
+jean -> $iutinfo (*publisher*)  
+marie -> iutinfo (*publisher*)  
+leo -> leo (*moderateur*)  
