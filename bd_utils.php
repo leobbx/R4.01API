@@ -278,28 +278,113 @@
 
     //fonction GET
     function getMessagePub($id) {
-        // appelle de la methode pour se connecter a la base de donnees
+        // appelle a la methode pour la connexion a la base de donnees
         $linkpdo = bdLink();
-        if ($id == null) {
-            // ecriture de la requete pour la consultation de donnees
-            $req = $linkpdo -> prepare("SELECT a.date_pub, a.text FROM article a");
-            // execution de la requete                          
-            $res = $req -> execute();
-            if($res == false){
+        // cas où l'id est égal à 0
+        if ($id == 0) {
+            $tab = array();
+            //requete pour la recuperation des données liés à un article
+            $req= $linkpdo -> query("SELECT a.id_article,a.date_pub,a.text,u.login 
+                                    FROM article a,utilisateur u WHERE u.id_utilisateur = a.id_utilisateur");
+
+            // entre dans la boucle si erreur dans la requete                       
+            if($req == false){
                 $req -> debugDumpParams();
                 die('Erreur execute');
+            } 
+
+            while ($res = $req -> fetch()) {
+                //requete comptant le nombre de like d'un article
+                $reqnblike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 1 AND l.Id_Article = :id");
+                //execution de la requete
+                $res1 = $reqnblike -> execute(array("id" => $res['id_article']));
+
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res1 == false){
+                    $reqnblike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nblike = $reqnblike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                // requete comptant le nombre de dislike d'un article
+                $reqnbdislike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 0 AND l.Id_Article = :id");
+                //execution de la requete
+                $res2 = $reqnbdislike -> execute(array("id" => $res['id_article']));
+                
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res2 == false){
+                    $reqnbdislike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nbdislike = $reqnbdislike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                // recuperation de toutes les donnees et insertion dans un tableau
+                $tab[] = array(
+                    "auteur" => $res['login'],
+                    "date de publication" => $res['date_pub'],
+                    "contenu" => $res['text'],
+                    "nombre de like" => $nblike,
+                    "nombre de dislike" => $nbdislike
+                );
             }
+            return $tab;
         } else {
-            // ecriture de la requete pour la consultation de donnees
-            $req = $linkpdo -> prepare("SELECT  a.date_pub, a.text FROM article a
-                                        WHERE a.id_utilisateur = $id");
-            // execution de la requete                          
-            $res = $req -> execute();
-            if($res == false){
+
+            $tab = array();
+            //requete pour la recuperation des données liés à un article
+            $req = $linkpdo -> query("SELECT a.id_article,a.date_pub,a.text,u.login 
+                                    FROM article a,utilisateur u WHERE u.id_utilisateur = a.id_utilisateur AND a.id_article = $id");
+
+            // entre dans la boucle si erreur dans la requete                       
+            if($req == false){
                 $req -> debugDumpParams();
                 die('Erreur execute');
+            } 
+
+            while ($res = $req -> fetch()) {
+                //requete comptant le nombre de like d'un article
+                $reqnblike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 1 AND l.Id_Article = :id");
+                //execution de la requete
+                $res1 = $reqnblike -> execute(array("id" => $id));
+
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res1 == false){
+                    $reqnblike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nblike = $resnblike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                // requete comptant le nombre de dislike d'un article
+                $reqnbdislike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 0 AND l.Id_Article = :id");
+                //execution de la requete
+                $res2 = $resnbdislike -> execute(array("id" => $id));
+                
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res2 == false){
+                    $reqnbdislike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nbdislike = $resnbdislike -> fetchAll(PDO::FETCH_ASSOC);
+                }
+
+                // recuperation de toutes les donnees et insertion dans un tableau
+                $tab[] = array(
+                    "auteur" => $res['login'],
+                    "date de publication" => $res['date_pub'],
+                    "contenu" => $res['text'],
+                    "nombre de like" => $nblike,
+                    "nombre de dislike" => $nbdislike
+                );
             }
-        }
+            return $tab;
+        }     
     }
 
     //fonction PATCH
@@ -308,10 +393,12 @@
         $linkpdo = bdLink();
         $retour = 0;
         // requete verifiant qu'il y a au moins une ligne inséré avec le login de l'utilisateur et de l'article
-        $req = $linkpdo -> query("SELECT COUNT(l.id_utilisateur) as nbligne , l.statute, u.id_utilisateur FROM like_dislike l, article a, utilisateur u 
-                                  WHERE l.Id_Article = a.id_article AND l.Id_Utilisateur = u.id_utilisateur 
-                                  AND u.login = $login AND a.id_article = $tab['id']");
-        if ($req == false){
+        $req = $linkpdo -> prepare("SELECT COUNT(like_dislike.id_utilisateur) as nbligne , like_dislike.statute, utilisateur.id_utilisateur as uti FROM like_dislike , article , utilisateur  
+                                  WHERE like_dislike.id_article = article.id_article AND like_dislike.id_utilisateur = utilisateur.id_utilisateur 
+                                  AND utilisateur.login = :login AND article.id_article = :id");
+        $req3 = $req -> execute(array("login" => $login,
+                                     "id" => $tab['id']));
+        if ($req3 == false){
             $req -> debugDumpParams();
             die('Erreur execute');
             $retour = 1;
@@ -323,8 +410,8 @@
             // si la requete donne une ligne
             if ($res['nbligne'] == 1) {
                 // cas où la valeur de la ligne déjà insérer est un like
-                if ($res['l.statute'] == 1) {
-                    $req1 = $linkpdo -> query("DELETE FROM like_dislike WHERE l.id_article = $tab['id'] AND l.id_utilisateur = $res['u.id_utilisateur']");
+                if ($res['statute'] == 1) {
+                    $req1 = $linkpdo -> query("DELETE FROM like_dislike  WHERE id_article = ".$tab['id']." AND id_utilisateur = ".$res['uti']."");
 
                     if($req1 == false){
                         $req1 -> debugDumpParams();
@@ -333,7 +420,7 @@
                     } 
                 //cas où la ligne déjà insérer est un dislike
                 } else {
-                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 0 WHERE id_article = $tab['id'] AND id_utilisateur = $res['u.id_utilisateur']");
+                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 0 WHERE id_article = ".$tab['id']." AND id_utilisateur = ".$res['uti']."");
 
                     if($req1 == false){
                         $req1 -> debugDumpParams();
@@ -342,10 +429,8 @@
                     } 
                 }
             } else {
-                $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (:id_article, :id_utilisateur, :statute)");
-                $res1 = $req -> execute(array('id_article' => $tab['id'],
-                                               'id_utilisateur' => $res['u.id_utilisateur'],
-                                               'statute' => 1));
+                $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (".$tab['id'].", ".$res['uti'].", 1)");
+                $res1 = $req1 -> execute();
                 
                 if($res1 == false){
                     $req1 -> debugDumpParams();
@@ -356,16 +441,16 @@
         } else {
             if ($res['nbligne'] == 1) {
                 // cas où la valeur de la ligne déjà insérer est un like
-                if ($res['l.statute'] == 0) {
-                    $req1 = $linkpdo -> query("DELETE FROM like_dislike WHERE l.id_article = $tab['id'] AND l.id_utilisateur = $res['u.id_utilisateur']");
+                if ($res['statute'] == 0) {
+                    $req1 = $linkpdo -> query("DELETE FROM like_dislike WHERE id_article = ".$tab['id']." AND id_utilisateur = ".$res['uti']."");
 
                     if($req1 == false){
                         $req1 -> debugDumpParams();
                         die('Erreur execute');
                         $retour = 1;
-                    } 
+                    }
                 } else {
-                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 1 WHERE id_article = $tab['id'] AND id_utilisateur = $res['u.id_utilisateur']");
+                    $req1 = $linkpdo -> query ("UPDATE like_dislike SET statute = 1 WHERE id_article = ".$tab['id']." AND id_utilisateur = ".$res['uti']."");
 
                     if($req1 == false){
                         $req1 -> debugDumpParams();
@@ -373,20 +458,19 @@
                         $retour = 1;
                     } 
                 }
-        } else {
-            $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (:id_article, :id_utilisateur, :statute)");
-            $res1 = $req -> execute(array('id_article' => $tab['id'],
-                                          'id_utilisateur' => $res['u.id_utilisateur'],
-                                           'statute' => 0));
+            } else {
+                $req1 = $linkpdo -> prepare("INSERT INTO like_dislike VALUES (:id_article, :id_utilisateur, 0)");
+                $res1 = $req1 -> execute(array('id_article' => $tab['id'],
+                                            'id_utilisateur' => $res['uti']));
 
-            if($res1 == false){
-                $req1 -> debugDumpParams();
-                die('Erreur execute');
-                $retour = 1;
-            } 
+                if($res1 == false){
+                    $req1 -> debugDumpParams();
+                    die('Erreur execute');
+                    $retour = 1;
+                } 
+            }
         }
     }
-
     // fonction PUT
     function modifArticle($tab){
         //appelle a la methode pour la connexion a la base de donnees
