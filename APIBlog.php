@@ -24,7 +24,12 @@ if (is_jwt_valid(get_bearer_token())){
                         $id = $_GET['id'];
                     }
         
-                    $matchingData = getMessagePub($id);
+                    /// Fait la differance entre l'appel a ces propre message (-1) ou la methode get classique
+                    if($id==-1){
+                        $matchingData = getPersonalMessage(get_login(get_bearer_token()));
+                    } else {
+                        $matchingData = getMessagePub($id);
+                    }
         
                     if (count($matchingData)==0) {
                         /// Envoi de l'erreur au client
