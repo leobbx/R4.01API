@@ -298,6 +298,61 @@
         } 
     }
 
+    // fonction GET c'est propre message
+    function getPersonalMessage($login) {
+        // appelle a la methode pour la connexion a la base de donnees
+        $linkpdo = bdLink();
+        $tab = array();
+        //requete pour la recuperation des données liés à un article
+        $req = $linkpdo -> query("SELECT a.id_article,a.date_pub,a.text,u.login 
+                                  FROM article a,utilisateur u WHERE u.id_utilisateur = a.id_utilisateur AND u.login = '$login'");
+
+            // entre dans la boucle si erreur dans la requete                       
+            if($req == false){
+                $req -> debugDumpParams();
+                die('Erreur execute');
+            } 
+
+            while ($res = $req -> fetch()) {
+                //requete comptant le nombre de like d'un article
+                $reqnblike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 1 AND l.Id_Article = :id");
+                //execution de la requete
+                $res1 = $reqnblike -> execute(array("id" => $res['id_article']));
+
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res1 == false){
+                    $reqnblike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nblike = $resnblike -> fetch();
+                }
+
+                // requete comptant le nombre de dislike d'un article
+                $reqnbdislike = $linkpdo -> prepare("SELECT COUNT(l.id_article) as nombre FROM article a, like_dislike l 
+                                                  WHERE a.id_article = l.Id_Article AND l.statute = 0 AND l.Id_Article = :id");
+                //execution de la requete
+                $res2 = $resnbdislike -> execute(array("id" => $res['id_article']));
+                
+                 // entre dans la boucle si erreur dans la requete                       
+                if($res2 == false){
+                    $reqnbdislike -> debugDumpParams();
+                    die('Erreur execute');
+                } else {
+                    $nbdislike = $resnbdislike -> fetch();
+                }
+
+                // recuperation de toutes les donnees et insertion dans un tableau
+                $tab[] = array(
+                    "date de publication" => $res['date_pub'],
+                    "contenu" => $res['text'],
+                    "nombre de like" => $nblike,
+                    "nombre de dislike" => $nbdislike
+                );
+            }
+            return $tab;
+    }
+
     //fonction GET
     function getMessagePub($id) {
         // appelle a la methode pour la connexion a la base de donnees
