@@ -76,6 +76,7 @@ function get_bearer_token() {
     return null;
 }
 
+// fonction recuperant le role dans le token
 function get_role($jwt) {
 	$tokenParts = explode('.', $jwt);
 	$payload = base64_decode($tokenParts[1]);
@@ -83,6 +84,7 @@ function get_role($jwt) {
 	return json_decode($payload)->role;
 }
 
+// fonction recuperant le login dans le token
 function get_login($jwt) {
 	$tokenParts = explode('.', $jwt);
 	$payload = base64_decode($tokenParts[1]);
