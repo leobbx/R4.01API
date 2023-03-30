@@ -6,5 +6,7 @@ Ce travail est réaliser par Babaux Léo et Ndiaye Fatime.
 
 *user -> password*  
 jean -> $iutinfo (*publisher*)  
-marie -> iutinfo (*publisher*)  
+marie -> iutinfo (*publisher*) 
+max -> moi (*publisher*)
+fatime -> SFR (*moderateur*)
 leo -> leo (*moderateur*)  
