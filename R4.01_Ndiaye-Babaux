@@ -1,0 +1,149 @@
+{
+	"info": {
+		"_postman_id": "6f6f5526-d460-4e52-b8a6-935b2ccd2334",
+		"name": "R4.01 TP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25745929"
+	},
+	"item": [
+		{
+			"name": "Connexion publisher",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\":\"max\",\r\n    \"password\":\"moi\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://hestiashop.fr/R4.01/APIAuth.php",
+					"protocol": "https",
+					"host": [
+						"hestiashop",
+						"fr"
+					],
+					"path": [
+						"R4.01",
+						"APIAuth.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Nouvel article",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\":\"En 2024, c'est les jeux olympique à Paris\",\r\n    \"id_utilisateur\": 4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://hestiashop.fr/R4.01/APIBlog.php",
+					"protocol": "https",
+					"host": [
+						"hestiashop",
+						"fr"
+					],
+					"path": [
+						"R4.01",
+						"APIBlog.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Connexion publisher",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"login\":\"leo\",\r\n    \"password\":\"leo\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://hestiashop.fr/R4.01/APIAuth.php",
+					"protocol": "https",
+					"host": [
+						"hestiashop",
+						"fr"
+					],
+					"path": [
+						"R4.01",
+						"APIAuth.php"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Supprimer article",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://hestiashop.fr/R4.01/APIBlog.php?id=14",
+					"protocol": "https",
+					"host": [
+						"hestiashop",
+						"fr"
+					],
+					"path": [
+						"R4.01",
+						"APIBlog.php"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "14"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get non authentifié",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://hestiashop.fr/R4.01/APIBlog.php?id=4",
+					"protocol": "https",
+					"host": [
+						"hestiashop",
+						"fr"
+					],
+					"path": [
+						"R4.01",
+						"APIBlog.php"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
